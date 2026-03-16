@@ -3,17 +3,15 @@ pipeline {
 
     environment {
         DOCKER_HUB_USER = '2023bcs0159karthik' 
-        // Your requested image name
         DOCKER_IMAGE = '2023bcs0159_jenkins_application' 
-        // The ID of the key you stored in Jenkins
-        DOCKER_CREDS_ID = 'dockerhub-credentials' 
         TAG = "${env.BUILD_NUMBER}"
+        // Directly injecting the token
+        DOCKER_PASS = 'dckr_pat_unSrx5Kx7gkgdAmxe4ccU2V-yKw'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Jenkins automatically uses the GitHub Key you 'attached' to the Job UI
                 checkout scm
             }
         }
@@ -40,17 +38,11 @@ pipeline {
             steps {
                 script {
                     echo "Pushing to Docker Hub..."
-                    // This command pulls the DOCKER_HUB_USER and DOCKERHUB_PASS keys from Jenkins memory
-                    withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDS_ID, 
-                                     usernameVariable: 'D_USER', 
-                                     passwordVariable: 'D_PASS')]) {
-                        sh """
-                        echo \$D_PASS | docker login -u \$D_USER --password-stdin
-                        docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG}
-                        docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest
-                        docker logout
-                        """
-                    }
+                    // Using the environment variable directly for login
+                    sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
+                    sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG}"
+                    sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest"
+                    sh "docker logout"
                 }
             }
         }
@@ -59,7 +51,7 @@ pipeline {
     post {
         always {
             echo "Pipeline finished."
-            // Cleanup to ensure local Docker doesn't get cluttered
+            // Cleanup local containers and images
             sh "docker stop temp-test-${TAG} || true"
             sh "docker rm temp-test-${TAG} || true"
             sh "docker rmi ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG} || true"
