@@ -2,47 +2,44 @@ pipeline {
     agent any
 
     environment {
-        // Your confirmed username
+        // 1. MUST match your Docker Hub Login Name
         DOCKER_HUB_USER = '2023bcs0159karthik' 
+        
+        // 2. MUST match the EXACT Repo name on hub.docker.com
         DOCKER_IMAGE = '2023bcs0159_jenkins_application' 
+        
         TAG = "${env.BUILD_NUMBER}"
-        // Your provided token
         DOCKER_PASS = 'dckr_pat_unSrx5Kx7gkgdAmxe4ccU2V-yKw'
     }
 
     stages {
-        stage('Cleanup & Login') {
+        stage('Build Image') {
             steps {
-                script {
-                    sh "docker logout || true"
-                    sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
-                }
+                // Build FIRST so the image exists locally before we even try to login
+                sh "docker build -t ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG} ."
+                sh "docker tag ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG} ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest"
             }
         }
 
-        stage('Build & Tag') {
+        stage('Docker Login') {
             steps {
-                script {
-                    echo "Building: ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG}"
-                    sh "docker build -t ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG} -t ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest ."
-                }
+                // Use single quotes around the password to prevent shell expansion issues
+                sh "echo '${DOCKER_PASS}' | docker login -u ${DOCKER_HUB_USER} --password-stdin"
             }
         }
 
-        stage('Push') {
+        stage('Push to Hub') {
             steps {
-                script {
-                    echo "Pushing Version ${TAG} and latest..."
-                    sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG}"
-                    sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest"
-                }
+                sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG}"
+                sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest"
             }
         }
     }
 
     post {
         always {
-            echo "Pipeline finished. Cleaning local images..."
+            sh "docker logout"
+            // Clean up images so your Jenkins container doesn't run out of space
             sh "docker rmi ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:${TAG} || true"
             sh "docker rmi ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest || true"
             cleanWs()
