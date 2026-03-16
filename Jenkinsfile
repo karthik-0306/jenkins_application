@@ -6,7 +6,7 @@ pipeline {
         DOCKER_HUB_USER = '2023bcs0159karthik' 
         
         // 2. MUST match the EXACT Repo name on hub.docker.com
-        DOCKER_IMAGE = '2023bcs0159_jenkins_application' 
+        DOCKER_IMAGE = '2023bcs0159_jenkins' 
         
         TAG = "${env.BUILD_NUMBER}"
         DOCKER_PASS = 'dckr_pat_unSrx5Kx7gkgdAmxe4ccU2V-yKw'
