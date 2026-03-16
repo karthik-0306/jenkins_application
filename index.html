@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,13 +21,39 @@
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 350px;
+            width: 380px;
+            /* Slightly wider to fit details */
         }
 
-        h1 { color: #2c3e50; margin-bottom: 10px; }
-        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        /* Assessment Details Styling */
+        .student-details {
+            text-align: left;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4e54c8;
+        }
+
+        .student-details p {
+            margin: 5px 0;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #1e293b;
+        }
+
         .pipeline-status {
             margin: 20px 0;
             padding: 10px;
@@ -36,7 +63,11 @@
             border: 1px solid #ddd;
         }
 
-        #status-text { color: #e74c3c; } /* Red for 'Inactive' */
+        #status-text {
+            color: #e74c3c;
+        }
+
+        /* Red for 'Inactive' */
 
         button {
             background-color: #4e54c8;
@@ -47,19 +78,32 @@
             cursor: pointer;
             font-size: 16px;
             transition: 0.3s;
+            width: 100%;
         }
 
-        button:hover { background-color: #24243e; transform: scale(1.05); }
+        button:hover {
+            background-color: #24243e;
+            transform: scale(1.02);
+        }
 
-        .active-mode #status-text { color: #2ecc71; } /* Green for 'Active' */
+        .active-mode #status-text {
+            color: #2ecc71;
+        }
+
+        /* Green for 'Active' */
     </style>
 </head>
+
 <body>
 
     <div class="app-container" id="main-card">
         <h1>Application using Jenkins</h1>
-        <h3>Thota Sai Karthik</h3>
-        <h3>2023BCS0159</h3>
+
+        <div class="student-details">
+            <p><span class="label">Name:</span> Thota Sai Karthik</p>
+            <p><span class="label">Roll Number:</span> 2023BCS0159</p>
+        </div>
+
         <div class="pipeline-status">
             System Status: <span id="status-text">INACTIVE</span>
         </div>
@@ -72,7 +116,7 @@
         function toggleStatus() {
             const container = document.getElementById('main-card');
             const status = document.getElementById('status-text');
-            
+
             if (status.innerText === "INACTIVE") {
                 status.innerText = "ACTIVE & DEPLOYED";
                 container.classList.add('active-mode');
@@ -84,4 +128,5 @@
         }
     </script>
 </body>
+
 </html>
